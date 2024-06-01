@@ -111,15 +111,17 @@ router.post("/signIn",(req,res)=>{
         })
     }
     else{
-        User.find({email}).then(result=>{
-            if (result.length>0){
-                const hashPassword=result[0].password;
+        User.find({email}).then(dta=>
+            {
+                // console.log(dta.length," ",dta[0].password);
+            if (dta.length>0){
+                const hashPassword=dta[0].password;
                 bcrypt.compare(password,hashPassword).then(result=>{
                     if (result){
                         res.json({
                             status:"SUCCESS",
                             message:"SigIn Successfull",
-                            data:result
+                            data:dta,
                         })
                     }
                     else{
