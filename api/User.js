@@ -148,7 +148,7 @@ const sendVerificationEmail= async ({_id,email},res)=>
 {
         
         //url to be used in the email
-        const currentUrl="http://localhost:8080/";
+        const currentUrl="http://localhost:5000/";
         const uniqueString=uuidv4()+_id;
         const mailOptions=
         {
