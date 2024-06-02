@@ -4,7 +4,8 @@ const UserSchema=new Schema({
     name : String,
     email:String,
     password:String,
-    dateOfBirth:Date
+    dateOfBirth:Date,
+    verified:Boolean
 });
 
 const User=mongoose.model("User",UserSchema);

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Response Page</title>
+  <style>
+    body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url("bg1.jpg");
+            background-size: cover;
+            background-attachment: fixed;
+            color: white;
+        }
+   .error-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+   .error-message {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      backdrop-filter: blur(5px);
+      -webkit-mask: linear-gradient(red, red) text;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <h1 class="error-message" id="error-message"></h1>
+  </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const message= urlParams.get('message');
+    if (error) {
+      document.getElementById('error-message').innerText =decodeURIComponent(message);
+    } else {
+      document.getElementById('error-message').innerText = 'User Verified Successfully';
+    }
+  </script>
+</body>
+</html>
