@@ -8,7 +8,10 @@ const User=require("../models/User.js");
 const UserVerification = require("../models/UserVerification.js");
 
 //ResetPassword DB
-const PasswordReset=require("../models/PasswordReset.js");
+const PasswordReset = require("../models/PasswordReset.js");
+
+// Axios for Project Related
+const axios = require("axios");
 
 //Email Handler
 const nodemailer=require("nodemailer");
@@ -24,6 +27,7 @@ require("dotenv").config();
 
 //Path for static website
 const path=require("path");
+const { count } = require("console");
 
 //Nodemailer Transporter
 let transporter=nodemailer.createTransport(
@@ -226,7 +230,7 @@ router.get("/verify/:userId/:uniqueString", async (req, res) => {
                 if (expiresAt < Date.now()) {
                     // Record has expired
                     UserVerification
-                        .deleteOne({ userId })
+                        .deleteMany({ userId })
                         .then((result) => {
                             User
                                 .deleteOne({ _id: userId })
@@ -612,5 +616,140 @@ router.post("/resetPassword", async (req, res) =>
 
         })
 
+})
+
+// OAuth Token 
+router.post("/AuthToken", async (req, res) =>
+{
+    postData = {
+        "client_id": "c7a811dc-559d-4faf-897e-70c75f861677",
+        "client_secret": "ZEDAeKYfY=2X=8MVbMRCBPKeWwxQqM9k5ZPzdFIxm",
+        "grant_type":"client_credentials"
+    }
+    await axios.post("https://rest.zuora.com/oauth/token", postData,
+        {
+            headers:
+            {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        }
+    )
+        .then((response) =>
+        {
+            console.log(response.data);
+            res.json({
+                status: "SUCCESS",
+                access_token: response.data.access_token,
+                expires_in: response.data.expires_in,
+                JTI: response.data.jti,
+                scope: response.data.scope,
+                token_type:response.data.token_type
+            })
+
+        })
+        .catch((error) => {
+            console.log(error);
+            res.json({
+                                status:"FAILED",
+                                message:"Error while getting the Authentication Token",
+                            });
+
+        })
+})
+
+router.post("/APIRequest_01", async (req, res) => {
+    const { offerId,emailId,phoneNumber,firstName,lastName,countryCode,addressCode,cityName,stateName,zipCode,cardNumber,cardCVV,expiryMonth,expiryYear } = req.body;
+    const postData = {
+                "user_id": 37,
+                "user_password": "QsouP9!5",
+                "connection_id": 1,
+                "payment_method_id": 1,
+                "campaign_id": 1,
+                "offers": [
+                        {
+                        "offer_id": offerId,
+                        "order_offer_quantity": 1
+                        },
+                    ],
+                "currency_id": 1,
+                "email": emailId,
+                "phone": phoneNumber,
+                "bill_fname": firstName,
+                "bill_lname": lastName,
+                "bill_country": countryCode,
+                "bill_address1": addressCode,
+                "bill_city": cityName,
+                "bill_state": stateName,
+                "bill_zipcode": zipCode,
+                "shipping_same": true,
+                "card_type_id": 2,
+                "card_number": cardNumber,
+                "card_cvv": cardCVV,
+                "card_exp_month": expiryMonth,
+                "card_exp_year": expiryYear,
+                "tracking1": "SA",
+                "tracking2": "01"
+}
+
+        
+    
+    await axios.post("https://globalmarketingpartners.sublytics.com/api/order/doAddProcess",postData,
+        {
+            headers:
+            {
+                    'Content-Type': 'application/json'
+            }
+        })
+        .then((response) =>
+        {
+            if (response.data.success) {
+                const transaction = response.data.data.transaction;
+                const order = transaction.order;
+
+                const responseMessage = transaction.response;
+                const gatewayResponseId = transaction.gateway_response_id;
+                const gatewayGatewayId = transaction.gateway_response_gateway_id;
+                const gatewayAuthCode = transaction.gateway_auth_code;
+
+                const orderId = order.id;
+                const customerId = order.customer_id;
+                const orderNotes = order.order_notes;
+
+                res.json({
+                    status: "SUCCESS",
+                    responseData: responseMessage,
+                    gateWayResponseID: gatewayResponseId,
+                    gateWayID: gatewayGatewayId,
+                    gateAuthCode: gatewayAuthCode,
+                    ORDERID: orderId,
+                    customerID: customerId,
+                    OrderNotes:orderNotes,
+                })
+            }
+            else {
+                const responseData = error.response.data;
+                const messageResposne = responseData.message;
+                const orderId = responseData.data.order_id;
+                res.json({
+                                status:"FAILED",
+                                message: `Error while communicating with the server : ${messageResposne}`,
+                                orderID:orderId,
+                                    
+                        });
+            }
+        })
+        .catch((error) =>
+        {
+            console.log(error);
+            const responseData = error.response.data;
+            const messageResposne = responseData.message;
+            const orderId = responseData.data.order_id;
+            res.json({
+                            status:"FAILED",
+                            message: `Error while communicating with the server : ${messageResposne}`,
+                            orderID:orderId,
+                                
+                    });
+        })
 })
 module.exports=router;
