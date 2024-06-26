@@ -732,7 +732,7 @@ router.post("/APIRequest_01", async (req, res) => {
                 const orderId = responseData.data.order_id;
                 res.json({
                                 status:"FAILED",
-                                message: `Error while communicating with the server : ${messageResposne}`,
+                                message: `${messageResposne}`,
                                 orderID:orderId,
                                     
                         });
