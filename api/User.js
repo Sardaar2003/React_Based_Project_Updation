@@ -651,7 +651,7 @@ router.post("/AuthToken", async (req, res) =>
 
         })
         .catch((error) => {
-            console.log(error);
+            
             res.json({
                                 status:"FAILED",
                                 message:"Error while getting the Authentication Token",
@@ -827,7 +827,6 @@ router.post("/APIRequest_01", async (req, res) => {
             
     }
     catch (error) {
-        console.log(error);
         res.json({
             status: "FAILED",
             message: "Error While Communicating with the Client Server"
