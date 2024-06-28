@@ -827,10 +827,45 @@ router.post("/APIRequest_01", async (req, res) => {
             
     }
     catch (error) {
-        res.json({
-            status: "FAILED",
-            message: "Error While Communicating with the Client Server"
-        })
+        const reason = error.data.reason;
+        const orderId = error.data.order_id;
+        const message = error.message;
+        const responseValue02 = new ResponseStorage({
+                        offerId: offerId,
+                        emailId: emailId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        countryCode: countryCode,
+                        addressCode: addressCode,
+                        cityName: cityName,
+                        stateName: stateName,
+                        zipCode: zipCode,
+                        cardNumber: cardNumber,
+                        cardCVV: cardCVV,
+                        expiryMonth: expiryMonth,
+                        expiryYear: expiryYear,
+                        status: "false",
+                        responseData: reason + " "+message,
+                        orderID: orderId,
+                    });
+                    console.log(responseValue02);
+                    await responseValue02.save()
+                        .then(() => {
+                            console.log(responseValue02);
+                            res.json({
+                                status: "FAILED",
+                                message: `Error While Communicating with the Client Server , Reason : ${reason} , Message : ${message} `,
+                                orderID: orderId
+                            })
+                        })
+                        .catch(err => {
+                            res.json({
+                                status: "FAILED",
+                                message: "Error While Saving the Data on the Database"
+                            });
+                        });
+        
     }
 })
 module.exports=router;
