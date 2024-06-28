@@ -695,8 +695,9 @@ router.post("/APIRequest_01", async (req, res) => {
     }
     try {
         const emailCount = await ResponseStorage.countDocuments({ emailId });
+        console.log("Checking the count");
         if (emailCount >= 2) {
-            res.json({
+            return res.json({
                 sucess: "FAILURE",
                 message:"Limit Exceeded"
             });
@@ -720,6 +721,7 @@ router.post("/APIRequest_01", async (req, res) => {
         })
         .then(async (response) =>
         {
+            console.log(response.data);
             if (response.data.success) {
                 const transaction = response.data.data.transaction;
                 const order = transaction.order;
@@ -758,7 +760,8 @@ router.post("/APIRequest_01", async (req, res) => {
                 });
                 
                 await responseValue.save()
-                        .then(() => {
+                    .then((cons) => {
+                        console.log(cons);
                             res.json({
                                 status: "SUCCESS",
                                 responseData: responseMessage,
