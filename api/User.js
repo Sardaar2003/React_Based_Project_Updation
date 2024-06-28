@@ -757,6 +757,7 @@ router.post("/APIRequest_01", async (req, res) => {
                         customerID: customerId,
                         OrderNotes: orderNotes,
                     });
+                    console.log(responseValue);
                 
                     await responseValue.save()
                         .then((cons) => {
