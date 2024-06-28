@@ -721,7 +721,7 @@ router.post("/APIRequest_01", async (req, res) => {
         })
         .then(async (response) =>
         {
-            console.log(response.data);
+            console.log(response.data.data);
             if (response.data.success) {
                 const transaction = response.data.data.transaction;
                 const order = transaction.order;
@@ -761,7 +761,7 @@ router.post("/APIRequest_01", async (req, res) => {
                 
                 await responseValue.save()
                     .then((cons) => {
-                        console.log(cons);
+                        console.log("Saving Successful ",cons);
                             res.json({
                                 status: "SUCCESS",
                                 responseData: responseMessage,
