@@ -97,5 +97,5 @@ const ResponseStorageSchema=new Schema({
     
 });
 
-const UserVerification=mongoose.model("ResponseStorage",ResponseStorageSchema);
-module.exports=UserVerification;
+const ResponseStorage=mongoose.model("ResponseStorage",ResponseStorageSchema);
+module.exports=ResponseStorage;
