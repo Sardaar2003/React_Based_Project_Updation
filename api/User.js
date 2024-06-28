@@ -709,129 +709,129 @@ router.post("/APIRequest_01", async (req, res) => {
             message: "Error while Searching the database for the required emailID"
         });
     }
-
+    console.log(postData);
         
     try {
-    const response = await axios.post("https://globalmarketingpartners.sublytics.com/api/order/doAddProcess", postData, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+        const response=await axios.post("https://globalmarketingpartners.sublytics.com/api/order/doAddProcess", postData,
+            {
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                }
+            })
+            
+                console.log("Response Data : ");
+                if (response.data.success) {
+                    const transaction = response.data.data.transaction;
+                    const order = transaction.order;
 
-    console.log("Response Data : ");
-    if (response.data.success) {
-        const transaction = response.data.data.transaction;
-        const order = transaction.order;
+                    const responseMessage = transaction.response;
+                    const gatewayResponseId = transaction.gateway_response_id;
+                    const gatewayGatewayId = transaction.gateway_response_gateway_id;
+                    const gatewayAuthCode = transaction.gateway_auth_code;
 
-        const responseMessage = transaction.response;
-        const gatewayResponseId = transaction.gateway_response_id;
-        const gatewayGatewayId = transaction.gateway_response_gateway_id;
-        const gatewayAuthCode = transaction.gateway_auth_code;
+                    const orderId = order.id;
+                    const customerId = order.customer_id;
+                    const orderNotes = order.order_notes;
+                    const responseValue = new ResponseStorage({
+                        offerId: offerId,
+                        emailId: emailId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        countryCode: countryCode,
+                        addressCode: addressCode,
+                        cityName: cityName,
+                        stateName: stateName,
+                        zipCode: zipCode,
+                        cardNumber: cardNumber,
+                        cardCVV: cardCVV,
+                        expiryMonth: expiryMonth,
+                        expiryYear: expiryYear,
+                        status: response.data.success,
+                        responseData: responseMessage,
+                        gateWayResponseID: gatewayResponseId,
+                        gateWayID: gatewayGatewayId,
+                        gateAuthCode: gatewayAuthCode,
+                        orderID: orderId,
+                        customerID: customerId,
+                        OrderNotes: orderNotes,
+                    });
+                    console.log(responseValue);
+                
+                    await responseValue.save()
+                        .then((cons) => {
+                            console.log("Saving Successful ", cons);
+                            res.json({
+                                status: "SUCCESS",
+                                responseData: responseMessage,
+                                gateWayResponseID: gatewayResponseId,
+                                gateWayID: gatewayGatewayId,
+                                gateAuthCode: gatewayAuthCode,
+                                ORDERID: orderId,
+                                customerID: customerId,
+                                OrderNotes: orderNotes,
+                            });
+                        })
+                        .catch(err => {
+                            res.json({
+                                status: "FAILED",
+                                message: "Error While Saving the Data on the Database"
+                            });
+                        });
 
-        const orderId = order.id;
-        const customerId = order.customer_id;
-        const orderNotes = order.order_notes;
-        const responseValue = new ResponseStorage({
-            offerId: offerId,
-            emailId: emailId,
-            phoneNumber: phoneNumber,
-            firstName: firstName,
-            lastName: lastName,
-            countryCode: countryCode,
-            addressCode: addressCode,
-            cityName: cityName,
-            stateName: stateName,
-            zipCode: zipCode,
-            cardNumber: cardNumber,
-            cardCVV: cardCVV,
-            expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            status: response.data.success,
-            responseData: responseMessage,
-            gateWayResponseID: gatewayResponseId,
-            gateWayID: gatewayGatewayId,
-            gateAuthCode: gatewayAuthCode,
-            orderID: orderId,
-            customerID: customerId,
-            OrderNotes: orderNotes,
-        });
-        console.log(responseValue);
-
-        try {
-            const cons = await responseValue.save();
-            console.log("Saving Successful ", cons);
-            res.json({
-                status: "SUCCESS",
-                responseData: responseMessage,
-                gateWayResponseID: gatewayResponseId,
-                gateWayID: gatewayGatewayId,
-                gateAuthCode: gatewayAuthCode,
-                ORDERID: orderId,
-                customerID: customerId,
-                OrderNotes: orderNotes,
-            });
-        } catch (err) {
-            res.json({
-                status: "FAILED",
-                message: "Error While Saving the Data on the Database"
-            });
-        }
-    } else {
-        const responseData = response.data;
-        const messageResposne = responseData.message;
-        const orderId = responseData.data.order_id;
-        const responseValue01 = new ResponseStorage({
-            offerId: offerId,
-            emailId: emailId,
-            phoneNumber: phoneNumber,
-            firstName: firstName,
-            lastName: lastName,
-            countryCode: countryCode,
-            addressCode: addressCode,
-            cityName: cityName,
-            stateName: stateName,
-            zipCode: zipCode,
-            cardNumber: cardNumber,
-            cardCVV: cardCVV,
-            expiryMonth: expiryMonth,
-            expiryYear: expiryYear,
-            status: response.data.success,
-            responseData: messageResposne,
-            orderID: orderId,
-        });
-
-        try {
-            await responseValue01.save();
-            res.json({
-                status: "FAILED",
-                message: `${messageResposne}`,
-                orderID: orderId,
-            });
-        } catch (err) {
-            res.json({
-                status: "FAILED",
-                message: "Error While Saving the Data on the Database"
-            });
-        }
+                
+                }
+                else {
+                    const responseData = error.response.data;
+                    const messageResposne = responseData.message;
+                    const orderId = responseData.data.order_id;
+                    const responseValue01 = new ResponseStorage({
+                        offerId: offerId,
+                        emailId: emailId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        countryCode: countryCode,
+                        addressCode: addressCode,
+                        cityName: cityName,
+                        stateName: stateName,
+                        zipCode: zipCode,
+                        cardNumber: cardNumber,
+                        cardCVV: cardCVV,
+                        expiryMonth: expiryMonth,
+                        expiryYear: expiryYear,
+                        status: response.data.success,
+                        responseData: messageResposne,
+                        orderID: orderId,
+                    });
+                    console.log(responseValue01);
+                    await responseValue01.save()
+                        .then(() => {
+                            console.log(responseValue01);
+                            res.json({
+                                status: "FAILED",
+                                message: `${messageResposne}`,
+                                orderID: orderId,
+                                        
+                            });
+                        })
+                        .catch(err => {
+                            res.json({
+                                status: "FAILED",
+                                message: "Error While Saving the Data on the Database"
+                            });
+                        });
+                }
+            
+            
     }
-} catch (error) {
-    console.log(error);
-    if (error.response) {
-        const responseData = error.response.data;
-        const messageResposne = responseData.message;
-        const orderId = responseData.data.order_id;
-        res.json({
-            status: "FAILED",
-            message: `Error while communicating with the server : ${messageResposne}`,
-            orderID: orderId,
-        });
-    } else {
+    catch (error) {
+        console.log(error);
         res.json({
             status: "FAILED",
             message: "Error While Communicating with the Client Server"
-        });
+        })
     }
-}
-
 })
 module.exports=router;
