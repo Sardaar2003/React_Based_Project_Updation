@@ -852,7 +852,7 @@ router.post("/APIRequest_01", async (req, res) => {
                     console.log(responseValue02);
                     await responseValue02.save()
                         .then(() => {
-                            console.log(responseValue02);
+                            // console.log(responseValue02);
                             res.json({
                                 status: "FAILED",
                                 message: `Error While Communicating with the Client Server , Message : ${message} `,
@@ -860,7 +860,7 @@ router.post("/APIRequest_01", async (req, res) => {
                             })
                         })
                         .catch(err => {
-                            console.log(err.response);
+                            console.log(err);
                             res.json({
                                 status: "FAILED",
                                 message: "Error While Saving the Data on the Database"
