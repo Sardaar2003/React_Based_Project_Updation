@@ -60,7 +60,6 @@ const ResponseStorageSchema=new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['SUCCESS', 'FAILED']
   },
   responseData: {
       type: String,
