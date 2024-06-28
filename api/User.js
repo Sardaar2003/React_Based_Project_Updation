@@ -827,6 +827,7 @@ router.post("/APIRequest_01", async (req, res) => {
             
     }
     catch (error) {
+        console.log(error.data);
         const reason = error.data.reason;
         const orderId = error.data.order_id;
         const message = error.message;
