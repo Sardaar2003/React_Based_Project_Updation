@@ -661,37 +661,37 @@ router.post("/AuthToken", async (req, res) =>
 })
 
 router.post("/APIRequest_01", async (req, res) => {
-    const { offerId,emailId,phoneNumber,firstName,lastName,countryCode,addressCode,cityName,stateName,zipCode,cardNumber,cardCVV,expiryMonth,expiryYear } = req.body;
+    const { offerId, emailId, phoneNumber, firstName, lastName, countryCode, addressCode, cityName, stateName, zipCode, cardNumber, cardCVV, expiryMonth, expiryYear } = req.body;
     const postData = {
-                "user_id": 37,
-                "user_password": "QsouP9!5",
-                "connection_id": 1,
-                "payment_method_id": 1,
-                "campaign_id": 1,
-                "offers": [
-                        {
-                        "offer_id": offerId,
-                        "order_offer_quantity": 1
-                        },
-                    ],
-                "currency_id": 1,
-                "email": emailId,
-                "phone": phoneNumber,
-                "bill_fname": firstName,
-                "bill_lname": lastName,
-                "bill_country": countryCode,
-                "bill_address1": addressCode,
-                "bill_city": cityName,
-                "bill_state": stateName,
-                "bill_zipcode": zipCode,
-                "shipping_same": true,
-                "card_type_id": 2,
-                "card_number": cardNumber,
-                "card_cvv": cardCVV,
-                "card_exp_month": expiryMonth,
-                "card_exp_year": expiryYear,
-                "tracking1": "SA",
-                "tracking2": "01"
+        "user_id": 37,
+        "user_password": "QsouP9!5",
+        "connection_id": 1,
+        "payment_method_id": 1,
+        "campaign_id": 1,
+        "offers": [
+            {
+                "offer_id": offerId,
+                "order_offer_quantity": 1
+            },
+        ],
+        "currency_id": 1,
+        "email": emailId,
+        "phone": phoneNumber,
+        "bill_fname": firstName,
+        "bill_lname": lastName,
+        "bill_country": countryCode,
+        "bill_address1": addressCode,
+        "bill_city": cityName,
+        "bill_state": stateName,
+        "bill_zipcode": zipCode,
+        "shipping_same": true,
+        "card_type_id": 2,
+        "card_number": cardNumber,
+        "card_cvv": cardCVV,
+        "card_exp_month": expiryMonth,
+        "card_exp_year": expiryYear,
+        "tracking1": "SA",
+        "tracking2": "01"
     }
     try {
         const emailCount = await ResponseStorage.countDocuments({ emailId });
@@ -699,69 +699,68 @@ router.post("/APIRequest_01", async (req, res) => {
         if (emailCount >= 2) {
             return res.json({
                 sucess: "FAILURE",
-                message:"Limit Exceeded"
+                message: "Limit Exceeded"
             });
         }
     } catch (err) {
         console.log(err);
         res.json({
-                sucess: "FAILURE",
-                message:"Error while Searching the database for the required emailID"
-            });
+            sucess: "FAILURE",
+            message: "Error while Searching the database for the required emailID"
+        });
     }
 
         
-    
-    await axios.post("https://globalmarketingpartners.sublytics.com/api/order/doAddProcess",postData,
-        {
-            headers:
+    try {
+        await axios.post("https://globalmarketingpartners.sublytics.com/api/order/doAddProcess", postData,
             {
+                headers:
+                {
                     'Content-Type': 'application/json'
-            }
-        })
-        .then(async (response) =>
-        {
-            console.log(response.data.data);
-            if (response.data.success) {
-                const transaction = response.data.data.transaction;
-                const order = transaction.order;
+                }
+            })
+            .then(async (response) => {
+                console.log("Response Data : ");
+                if (response.data.success) {
+                    const transaction = response.data.data.transaction;
+                    const order = transaction.order;
 
-                const responseMessage = transaction.response;
-                const gatewayResponseId = transaction.gateway_response_id;
-                const gatewayGatewayId = transaction.gateway_response_gateway_id;
-                const gatewayAuthCode = transaction.gateway_auth_code;
+                    const responseMessage = transaction.response;
+                    const gatewayResponseId = transaction.gateway_response_id;
+                    const gatewayGatewayId = transaction.gateway_response_gateway_id;
+                    const gatewayAuthCode = transaction.gateway_auth_code;
 
-                const orderId = order.id;
-                const customerId = order.customer_id;
-                const orderNotes = order.order_notes;
-                const responseValue = new ResponseStorage({
-                    offerId: offerId,
-                    emailId: emailId,
-                    phoneNumber: phoneNumber,
-                    firstName: firstName,
-                    lastName: lastName,
-                    countryCode: countryCode,
-                    addressCode: addressCode,
-                    cityName: cityName,
-                    stateName: stateName,
-                    zipCode: zipCode,
-                    cardNumber: cardNumber,
-                    cardCVV: cardCVV,
-                    expiryMonth: expiryMonth,
-                    expiryYear: expiryYear,
-                    status: response.data.success,
-                    responseData: responseMessage,
-                    gateWayResponseID: gatewayResponseId,
-                    gateWayID: gatewayGatewayId,
-                    gateAuthCode: gatewayAuthCode,
-                    orderID: orderId,
-                    customerID: customerId,
-                    OrderNotes:orderNotes,
-                });
+                    const orderId = order.id;
+                    const customerId = order.customer_id;
+                    const orderNotes = order.order_notes;
+                    const responseValue = new ResponseStorage({
+                        offerId: offerId,
+                        emailId: emailId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        countryCode: countryCode,
+                        addressCode: addressCode,
+                        cityName: cityName,
+                        stateName: stateName,
+                        zipCode: zipCode,
+                        cardNumber: cardNumber,
+                        cardCVV: cardCVV,
+                        expiryMonth: expiryMonth,
+                        expiryYear: expiryYear,
+                        status: response.data.success,
+                        responseData: responseMessage,
+                        gateWayResponseID: gatewayResponseId,
+                        gateWayID: gatewayGatewayId,
+                        gateAuthCode: gatewayAuthCode,
+                        orderID: orderId,
+                        customerID: customerId,
+                        OrderNotes: orderNotes,
+                    });
                 
-                await responseValue.save()
-                    .then((cons) => {
-                        console.log("Saving Successful ",cons);
+                    await responseValue.save()
+                        .then((cons) => {
+                            console.log("Saving Successful ", cons);
                             res.json({
                                 status: "SUCCESS",
                                 responseData: responseMessage,
@@ -781,38 +780,38 @@ router.post("/APIRequest_01", async (req, res) => {
                         });
 
                 
-            }
-            else {
-                const responseData = error.response.data;
-                const messageResposne = responseData.message;
-                const orderId = responseData.data.order_id;
-                const responseValue01 = new ResponseStorage({
-                    offerId: offerId,
-                    emailId: emailId,
-                    phoneNumber: phoneNumber,
-                    firstName: firstName,
-                    lastName: lastName,
-                    countryCode: countryCode,
-                    addressCode: addressCode,
-                    cityName: cityName,
-                    stateName: stateName,
-                    zipCode: zipCode,
-                    cardNumber: cardNumber,
-                    cardCVV: cardCVV,
-                    expiryMonth: expiryMonth,
-                    expiryYear: expiryYear,
-                    status: response.data.success,
-                    responseData: messageResposne,
-                    orderID: orderId,
-                });
-                await responseValue01.save()
+                }
+                else {
+                    const responseData = error.response.data;
+                    const messageResposne = responseData.message;
+                    const orderId = responseData.data.order_id;
+                    const responseValue01 = new ResponseStorage({
+                        offerId: offerId,
+                        emailId: emailId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        countryCode: countryCode,
+                        addressCode: addressCode,
+                        cityName: cityName,
+                        stateName: stateName,
+                        zipCode: zipCode,
+                        cardNumber: cardNumber,
+                        cardCVV: cardCVV,
+                        expiryMonth: expiryMonth,
+                        expiryYear: expiryYear,
+                        status: response.data.success,
+                        responseData: messageResposne,
+                        orderID: orderId,
+                    });
+                    await responseValue01.save()
                         .then(() => {
-                                res.json({
-                                    status:"FAILED",
-                                    message: `${messageResposne}`,
-                                    orderID:orderId,
+                            res.json({
+                                status: "FAILED",
+                                message: `${messageResposne}`,
+                                orderID: orderId,
                                         
-                                });
+                            });
                         })
                         .catch(err => {
                             res.json({
@@ -820,20 +819,27 @@ router.post("/APIRequest_01", async (req, res) => {
                                 message: "Error While Saving the Data on the Database"
                             });
                         });
-            }
-        })
-        .catch((error) =>
-        {
-            console.log(error);
-            const responseData = error.response.data;
-            const messageResposne = responseData.message;
-            const orderId = responseData.data.order_id;
-            res.json({
-                            status:"FAILED",
-                            message: `Error while communicating with the server : ${messageResposne}`,
-                            orderID:orderId,
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                const responseData = error.response.data;
+                const messageResposne = responseData.message;
+                const orderId = responseData.data.order_id;
+                res.json({
+                    status: "FAILED",
+                    message: `Error while communicating with the server : ${messageResposne}`,
+                    orderID: orderId,
                                 
-                    });
+                });
+            })
+    }
+    catch (error) {
+        console.log(error);
+        res.json({
+            status: "FAILED",
+            message: "Error While Communicating with the Client Server"
         })
+    }
 })
 module.exports=router;
