@@ -10,6 +10,9 @@ const UserVerification = require("../models/UserVerification.js");
 //ResetPassword DB
 const PasswordReset = require("../models/PasswordReset.js");
 
+//Response Storage DB
+const ResponseStorage = require("../models/ResponseStorage.js");
+
 // Axios for Project Related
 const axios = require("axios");
 
@@ -689,7 +692,22 @@ router.post("/APIRequest_01", async (req, res) => {
                 "card_exp_year": expiryYear,
                 "tracking1": "SA",
                 "tracking2": "01"
-}
+    }
+    try {
+        const emailCount = await ResponseStorage.countDocuments({ emailId });
+        if (emailCount >= 2) {
+            res.json({
+                sucess: "FAILURE",
+                message:"Limit Exceeded"
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.json({
+                sucess: "FAILURE",
+                message:"Error while Searching the database for the required emailID"
+            });
+    }
 
         
     
@@ -700,7 +718,7 @@ router.post("/APIRequest_01", async (req, res) => {
                     'Content-Type': 'application/json'
             }
         })
-        .then((response) =>
+        .then(async (response) =>
         {
             if (response.data.success) {
                 const transaction = response.data.data.transaction;
@@ -714,27 +732,90 @@ router.post("/APIRequest_01", async (req, res) => {
                 const orderId = order.id;
                 const customerId = order.customer_id;
                 const orderNotes = order.order_notes;
-
-                res.json({
-                    status: "SUCCESS",
+                const responseValue = new ResponseStorage({
+                    offerId: offerId,
+                    emailId: emailId,
+                    phoneNumber: phoneNumber,
+                    firstName: firstName,
+                    lastName: lastName,
+                    countryCode: countryCode,
+                    addressCode: addressCode,
+                    cityName: cityName,
+                    stateName: stateName,
+                    zipCode: zipCode,
+                    cardNumber: cardNumber,
+                    cardCVV: cardCVV,
+                    expiryMonth: expiryMonth,
+                    expiryYear: expiryYear,
+                    status: response.data.success,
                     responseData: responseMessage,
                     gateWayResponseID: gatewayResponseId,
                     gateWayID: gatewayGatewayId,
                     gateAuthCode: gatewayAuthCode,
-                    ORDERID: orderId,
+                    orderID: orderId,
                     customerID: customerId,
                     OrderNotes:orderNotes,
-                })
+                });
+                
+                await responseValue.save()
+                        .then(() => {
+                            res.json({
+                                status: "SUCCESS",
+                                responseData: responseMessage,
+                                gateWayResponseID: gatewayResponseId,
+                                gateWayID: gatewayGatewayId,
+                                gateAuthCode: gatewayAuthCode,
+                                ORDERID: orderId,
+                                customerID: customerId,
+                                OrderNotes: orderNotes,
+                            });
+                        })
+                        .catch(err => {
+                            res.json({
+                                status: "FAILED",
+                                message: "Error While Saving the Data on the Database"
+                            });
+                        });
+
+                
             }
             else {
                 const responseData = error.response.data;
                 const messageResposne = responseData.message;
                 const orderId = responseData.data.order_id;
-                res.json({
-                                status:"FAILED",
-                                message: `${messageResposne}`,
-                                orderID:orderId,
-                                    
+                const responseValue01 = new ResponseStorage({
+                    offerId: offerId,
+                    emailId: emailId,
+                    phoneNumber: phoneNumber,
+                    firstName: firstName,
+                    lastName: lastName,
+                    countryCode: countryCode,
+                    addressCode: addressCode,
+                    cityName: cityName,
+                    stateName: stateName,
+                    zipCode: zipCode,
+                    cardNumber: cardNumber,
+                    cardCVV: cardCVV,
+                    expiryMonth: expiryMonth,
+                    expiryYear: expiryYear,
+                    status: response.data.success,
+                    responseData: messageResposne,
+                    orderID: orderId,
+                });
+                await responseValue01.save()
+                        .then(() => {
+                                res.json({
+                                    status:"FAILED",
+                                    message: `${messageResposne}`,
+                                    orderID:orderId,
+                                        
+                                });
+                        })
+                        .catch(err => {
+                            res.json({
+                                status: "FAILED",
+                                message: "Error While Saving the Data on the Database"
+                            });
                         });
             }
         })
