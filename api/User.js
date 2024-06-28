@@ -828,7 +828,6 @@ router.post("/APIRequest_01", async (req, res) => {
     }
     catch (error) {
             const { data } = error.response;
-            const reason = data.data.reason;
             const orderId = data.data.order_id;
             const message = data.message;
         const responseValue02 = new ResponseStorage({
@@ -847,7 +846,7 @@ router.post("/APIRequest_01", async (req, res) => {
                         expiryMonth: expiryMonth,
                         expiryYear: expiryYear,
                         status: "false",
-                        responseData: reason + " "+message,
+                        responseData: message,
                         orderID: orderId,
                     });
                     console.log(responseValue02);
@@ -856,11 +855,12 @@ router.post("/APIRequest_01", async (req, res) => {
                             console.log(responseValue02);
                             res.json({
                                 status: "FAILED",
-                                message: `Error While Communicating with the Client Server , Reason : ${reason} , Message : ${message} `,
+                                message: `Error While Communicating with the Client Server , Message : ${message} `,
                                 orderID: orderId
                             })
                         })
                         .catch(err => {
+                            console.log(err.response);
                             res.json({
                                 status: "FAILED",
                                 message: "Error While Saving the Data on the Database"
