@@ -720,7 +720,7 @@ router.post("/APIRequest_01", async (req, res) => {
                 }
             })
             
-                console.log("Response Data : ");
+                console.log("Response Data : ",response.data);
                 if (response.data.success) {
                     const transaction = response.data.data.transaction;
                     const order = transaction.order;
@@ -827,7 +827,8 @@ router.post("/APIRequest_01", async (req, res) => {
             
     }
     catch (error) {
-            const { data } = error.response;
+        const { data } = error.response;
+        console.log(data);
             const orderId = data.data.order_id;
             const message = data.message;
         const responseValue02 = new ResponseStorage({
