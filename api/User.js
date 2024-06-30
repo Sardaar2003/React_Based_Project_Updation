@@ -698,14 +698,14 @@ router.post("/APIRequest_01", async (req, res) => {
         console.log("Checking the count");
         if (emailCount >= 2) {
             return res.json({
-                sucess: "FAILURE",
+                sucess: "FAILED",
                 message: "Limit Exceeded"
             });
         }
     } catch (err) {
         console.log(err);
         res.json({
-            sucess: "FAILURE",
+            sucess: "FAILED",
             message: "Error while Searching the database for the required emailID"
         });
     }
