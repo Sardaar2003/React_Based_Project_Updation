@@ -697,15 +697,15 @@ router.post("/APIRequest_01", async (req, res) => {
         const emailCount = await ResponseStorage.countDocuments({ emailId });
         console.log("Checking the count");
         if (emailCount >= 2) {
-            return res.json({
-                sucess: "FAILED",
+            res.json({
+                status: "FAILED",
                 message: "Limit Exceeded"
             });
         }
     } catch (err) {
         console.log(err);
         res.json({
-            sucess: "FAILED",
+            status: "FAILED",
             message: "Error while Searching the database for the required emailID"
         });
     }
