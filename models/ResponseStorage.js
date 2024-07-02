@@ -1,6 +1,10 @@
 const mongoose=require("mongoose");
 const Schema=mongoose.Schema;
 const ResponseStorageSchema=new Schema({
+  UserName: {
+    type: String,
+    required:true,
+  },
     offerId: {
     type: String,
     required: true
